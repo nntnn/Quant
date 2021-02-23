@@ -56,7 +56,7 @@ def pd_dup_col(df:pd.DataFrame):
                 chk_sum += 1
         if chk_sum == len(chklist):
             dellist.append(v)
-    #print(dellist)
+    print(dellist)
     df = df.drop(dellist)
     return df
 
@@ -87,14 +87,14 @@ def report(code, conn):
             {'class':'us_table_ty1 h_fix zigbg_no'},     # 재무비율
                       ]
         lnks_name = [
-            'INV_INDEX',
-            'FIN_PORTION',
+            'INV_INDEX_KOSPI',
+            'FIN_PORTION_KOSPI',
             ]
 
         for lnk_i, lnk in enumerate(lnks):
             lnks[lnk_i] += code
         
-        lnk_i = 0
+        lnk_i = 1
         lnk = lnks[lnk_i]
         print(lnk)
 
@@ -153,7 +153,8 @@ def report(code, conn):
 
                     # df 확인해보기
                     #pg.show(df)
-
+                    if idx_i == 1:
+                        break
                     # IFRS 연결
             except Exception as ex2:
                 print(ex2)

@@ -94,72 +94,72 @@ def report(code, conn):
         for lnk_i, lnk in enumerate(lnks):
             lnks[lnk_i] += code
         
-        lnk_i = 1
-        lnk = lnks[lnk_i]
-        print(lnk)
+        for lnk_i in list(range(0, 1)):
+            lnk = lnks[lnk_i]
+            print(lnk)
 
-        # 뷰티풀 수프로 테이블을 스크래핑
-        drv.get(lnk)
-        bs_res = bs(drv.page_source, 'lxml')
-        drv.quit()
+            # 뷰티풀 수프로 테이블을 스크래핑
+            drv.get(lnk)
+            bs_res = bs(drv.page_source, 'lxml')
+            drv.quit()
 
-        # requests로 테이블 스크래핑
-        #resp = rq.get(lnk)
-        #print(resp.content.decode('utf-8'))
-        #bs_res = bs(resp.content, "lxml")
+            # requests로 테이블 스크래핑
+            #resp = rq.get(lnk)
+            #print(resp.content.decode('utf-8'))
+            #bs_res = bs(resp.content, "lxml")
         
-        tbs = bs_res.find_all('table', lnks_params[lnk_i])
+            tbs = bs_res.find_all('table', lnks_params[lnk_i])
 
-        if len(tbs) != 0:
-            try:
-                dfs = pd.read_html(str(tbs))
-                for df in dfs:
-                    print(df)
-                    df = df.set_index(df.columns.tolist()[0]) # 테이블의 iloc[0,0]을 index로 설정.
+            if len(tbs) != 0:
+                try:
+                    dfs = pd.read_html(str(tbs))
+                    for df in dfs:
+                        print(df)
+                        df = df.set_index(df.columns.tolist()[0]) # 테이블의 iloc[0,0]을 index로 설정.
 
-                    # 중복열 drop
-                    df = pd_dup_col(df)
+                        # 중복열 drop
+                        df = pd_dup_col(df)
 
-                    # 인덱스 문자 깔끔하게 정리
-                    df = pd_remove_txt(df, '계산에 참여한 계정')
+                        # 인덱스 문자 깔끔하게 정리
+                        df = pd_remove_txt(df, '계산에 참여한 계정')
 
-                    # 행열 바꾸기
-                    df = df.transpose()
+                        # 행열 바꾸기
+                        df = df.transpose()
 
-                    # index를 종목코드:연도/최종월 형태로 바꾸기
-                    indexlist = df.index.tolist()
-                    for lst_idx, lst in enumerate(indexlist):
-                        #print(code[:code.find('\n')])
-                        indexlist[lst_idx] = code[:code.find('\n')] + ':' + lst
-                        indexlist[lst_idx] = indexlist[lst_idx][:indexlist[lst_idx].find('/')]
-                    print(indexlist)
-                    df = df.set_index(pd.Series(indexlist))
-                    df.index.name = 'ticker:year'
-                    df.reset_index()
-                    print(df)
+                        # index를 종목코드:연도/최종월 형태로 바꾸기
+                        indexlist = df.index.tolist()
+                        for lst_idx, lst in enumerate(indexlist):
+                            #print(code[:code.find('\n')])
+                            indexlist[lst_idx] = code[:code.find('\n')] + ':' + lst
+                            indexlist[lst_idx] = indexlist[lst_idx][:indexlist[lst_idx].find('/')]
+                        print(indexlist)
+                        df = df.set_index(pd.Series(indexlist))
+                        df.index.name = 'ticker:year'
+                        df.reset_index()
+                        print(df)
 
-                    # df dtype 정의. dict={'column name':sqlalchemy.types.type(n), }
-                    columnlist = df.columns.tolist()
-                    idxname = df.index.name
-                    print(columnlist, idxname)
-                    dd = {}     # stands for df_dtype
-                    dd[idxname]=sqlalchemy.types.String(12)
-                    #for col in columnlist:
-                    #    dd['col'] = sqlalchemy.types.Float()
-                    print(dd)
+                        # df dtype 정의. dict={'column name':sqlalchemy.types.type(n), }
+                        columnlist = df.columns.tolist()
+                        idxname = df.index.name
+                        print(columnlist, idxname)
+                        dd = {}     # stands for df_dtype
+                        dd[idxname]=sqlalchemy.types.String(12)
+                        #for col in columnlist:
+                        #    dd['col'] = sqlalchemy.types.Float()
+                        print(dd)
 
-                    # DB 연결
-                    df.to_sql(name = lnks_name[lnk_i], con = conn, if_exists='append', index=True, dtype=dd)
+                        # DB 연결
+                        df.to_sql(name = lnks_name[lnk_i], con = conn, if_exists='append', index=True, dtype=dd)
 
-                    # df 확인해보기
-                    #pg.show(df)
-                    if idx_i == 1:
-                        break
-                    # IFRS 연결
-            except Exception as ex2:
-                print(ex2)
-        else:
-            print('no table found.', len(tbs))
+                        # df 확인해보기
+                        #pg.show(df)
+                        if idx_i == 1:
+                            break
+                        # IFRS 연결
+                except Exception as ex2:
+                    print(ex2)
+            else:
+                print('no table found.', len(tbs))
     
     except Exception as ex:
         print('rq.get failed.', ex)

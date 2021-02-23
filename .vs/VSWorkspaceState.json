@@ -2,9 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\1_Crawl",
+    "\\1_Crawl\\a_dart",
     "\\Database_2",
     "\\_exec"
   ],
-  "SelectedNode": "\\_exec\\chromedriver.exe",
+  "SelectedNode": "\\1_Crawl\\data_KOSPI_1145_20210223.xlsx",
   "PreviewInSolutionExplorer": false
 }

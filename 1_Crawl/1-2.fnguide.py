@@ -19,6 +19,8 @@ import pymysql
 pymysql.install_as_MySQLdb()
 import MySQLdb	
 
+def_path = 'C:/Users/Admin/source/repos/nntnn/Quant/'
+
 def mysqlCON():
     HN, PORT, USER, PW, DB, CHARSET = 'ntntn.mooo.com', 6352, 'dart', 'kye6121!!', 'DART', 'utf8'
     con_str_fmt = "mysql+mysqldb://{0}:{1}@{2}:{3}/{4}?charset={5}"
@@ -56,8 +58,8 @@ def pd_dup_col(df:pd.DataFrame):
                 chk_sum += 1
         if chk_sum == len(chklist):
             dellist.append(v)
-    print(dellist)
     df = df.drop(dellist)
+    print('deleted columns', dellist)
     return df
 
 def pd_remove_txt(df:pd.DataFrame, rm_txt):
@@ -71,12 +73,12 @@ def pd_remove_txt(df:pd.DataFrame, rm_txt):
     df = df.set_index(pd.Series(indexlist))
     return df
 
-def report(code, conn):
+def report(code, conn, code_idx):
     opt = webdriver.ChromeOptions()
     opt.add_argument('headless')
 
     # 웹드라이버를 통해 fnguide 페이지에 접속
-    drv = webdriver.Chrome('_exec/chromedriver.exe', options=opt)
+    drv = webdriver.Chrome(def_path + '_exec/chromedriver.exe', options=opt)
     drv.implicitly_wait(10)
     try:
         lnks = ['https://comp.fnguide.com/SVO2/asp/SVD_Invest.asp?pGB=1&gicode=',        # 투자지표
@@ -85,37 +87,63 @@ def report(code, conn):
         lnks_params = [
             {'class':'us_table_ty1 h_fix zigbg_no'},    # 투자지표
             {'class':'us_table_ty1 h_fix zigbg_no'},     # 재무비율
-                      ]
+                     ]
         lnks_name = [
             'INV_INDEX_KOSPI',
             'FIN_PORTION_KOSPI',
+            ]
+        lnks_captions = [
+            '기업가치 지표',
+            '재무비율',
+            ]
+        lnks_comment = [
+            {0:['기업가치 지표','']},
+            {1:['재무비율 [누적]','재무비율 [3개월]']}
             ]
 
         for lnk_i, lnk in enumerate(lnks):
             lnks[lnk_i] += code
         
-        #for lnk_i in list(range(-1, 2)):
-        lnk_i = 1    
+        #for lnk_i in list(range(0, len(lnks))):
+        lnk_i = code_idx 
         lnk = lnks[lnk_i]
         print(lnk, lnk_i)
 
         # 뷰티풀 수프로 테이블을 스크래핑
         drv.get(lnk)
-        bs_res = bs(drv.page_source, 'lxml')
+        #print(type(drv.page_source), drv.page_source)
+        
+        #find comments in lnks_comment
+        txts = drv.page_source
+        print( ((lnks_comment[lnk_i])[lnk_i])[0], ((lnks_comment[lnk_i])[lnk_i])[1] )
+        start = txts.find(((lnks_comment[lnk_i])[lnk_i])[0])
+        end = txts.find(((lnks_comment[lnk_i])[lnk_i])[1])
+        
+        if(((lnks_comment[lnk_i])[lnk_i])[1] == ''):
+            txts = txts[start:]
+        else:
+            txts = txts[start:end]    
+        #print(txts)
+        #bs_res = bs(drv.page_source, 'lxml')
+        bs_res = bs(txts, 'lxml')
         drv.quit()
 
-        # requests로 테이블 스크래핑
-        #resp = rq.get(lnk)
-        #print(resp.content.decode('utf-8'))
-        #bs_res = bs(resp.content, "lxml")
-        
-        tbs = bs_res.find_all('table', lnks_params[lnk_i])
+        # find specific captions 
+        for caption in bs_res.find_all('caption'):
+            if caption.get_text() == lnks_captions[lnk_i]:
+                tbs = caption.find_parent('table', lnks_params[lnk_i])
+
+        # VS
+        # tbs = bs_res.find_all('table', lnks_params[lnk_i])
 
         if len(tbs) != 0:
             try:
                 dfs = pd.read_html(str(tbs))
-                for df in dfs:
-                    print(df)
+                for df_i, df in enumerate(dfs):
+                    print('df_index : ', df_i,'/',len(dfs))
+                    if df_i > 0:
+                        break
+                    #print(df)
                     df = df.set_index(df.columns.tolist()[0]) # 테이블의 iloc[0,0]을 index로 설정.
 
                     # 중복열 drop
@@ -142,7 +170,7 @@ def report(code, conn):
                     # df dtype 정의. dict={'column name':sqlalchemy.types.type(n), }
                     columnlist = df.columns.tolist()
                     idxname = df.index.name
-                    print(columnlist, idxname)
+                    #print(columnlist, idxname)
                     dd = {}     # stands for df_dtype
                     dd[idxname]=sqlalchemy.types.String(12)
                     #for col in columnlist:
@@ -154,26 +182,27 @@ def report(code, conn):
 
                     # df 확인해보기
                     #pg.show(df)
-                    if idx_i == 1:
-                        break
                     # IFRS 연결
             except Exception as ex2:
                 print(ex2)
         else:
             print('no table found.', len(tbs))
-    
+        time.sleep(2)
     except Exception as ex:
         print('rq.get failed.', ex)
         drv.quit()
     time.sleep(2)
 
 def __main__():
-    corpcode_txt = open("1_Crawl/corplist.txt", "r")
+    corpcode_txt = open(def_path + "1_Crawl/corplist.txt", "r")
     lines = corpcode_txt.readlines()
     conn = mysqlCON()
 
     for line in lines:
-        report('A'+line, conn)
-
+        for i in list(range(0,2)):
+            report('A'+line, conn, i)
+    #for i in list(range(0,2)):
+    #    report('A172580', conn, i)
+        
 if __name__ == "__main__":
     __main__()

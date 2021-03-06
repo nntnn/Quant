@@ -86,4 +86,3 @@ print(len(scr_list))
 #[m.start() for m in re.finditer('test', 'test test test test')]
 for m in re.finditer('([{](.*?)[}])', scr_list[0]):
     print(m.span(), m.group())
-

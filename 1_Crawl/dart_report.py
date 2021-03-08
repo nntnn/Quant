@@ -86,17 +86,37 @@ def __main__():
     parse_params={'type':'text/javascript'}
     tbs = wd(lnk, types='script', params = parse_params)
 
-    str_a = ['function initPage()','var viewport = new Ext.Viewport']#'//팝업 순서']
+    str_a = ['function initPage()','function replaceHtml(']#'var viewport = new Ext.Viewport']#'//팝업 순서']
     scr_list = bs_find(tbs, str_a[0], str_a[1])
     print(len(scr_list))
-    [m.start() for m in re.finditer('([{](.*?)[}])', scr_list[0])]
+    
+    txtlist = []
     #[m.start() for m in re.finditer('test', 'test test test test')]
     for m in re.finditer('(text: ")(.*?)(",)', scr_list[0]):
-        print(m.span(), m.group())
-    for m in re.finditer('(viewDoc\(\')(.*?)(\'\))', scr_list[0]):
-        print(m.span(), m.group())
-        for n in re.finditer('(\').*?(\')', m.group()):
-            print(n.span(), n.group())
+        #print(m.span(), m.group())
+        txtlist.append(m.group())
+    print(len(txtlist))
+    print(txtlist)
+
+    idxdict = {}
+    for m_idx, m in enumerate(re.finditer('(viewDoc\(\')(.*?)(\'\))', scr_list[0])):
+        #print(m.span(), m.group())
+        doclist = []
+        for n in re.finditer('(\').*?(\')|(null)', m.group()):
+            #print(n.span(), n.group())
+            doclist.append(n.group())
+        idxdict[doclist[2]] = [doclist[3], doclist[4], doclist[5]] # txtlist[m_idx], 
+    print(len(idxdict))
+    print(idxdict)
+    for D_idx, DocValues in enumerate(re.finditer('(currentDocValues = {)(.*?)(};)', scr_list[0])):
+        print(DocValues.span(), DocValues.group())
+        curValues = DocValues.group()
+        if D_idx != 0:
+            break
+    curValues = curValues[curValues.find('{')+1:curValues.find('}')-1]
+    Values = curValues.split(',')
+    print(Values)
+
     # http://dart.fss.or.kr/report/viewer.do?
     # rcpNo=20200330004441&
     # dcmNo=7206202&

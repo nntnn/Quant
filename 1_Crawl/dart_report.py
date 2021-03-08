@@ -9,6 +9,8 @@ import lxml
 import json
 import re
 
+import os
+
 def wd(lnk, types='', params={}, unwanted_params={}):
     # wd stands for webdriver. Parse and Find
     # func(**{'type':'Event'}) is equivalent to func(type='Event')
@@ -58,26 +60,31 @@ def bs_find(bs, start='', end=''):
     except Exception as ex:
         print(ex)
 
-def json(string):
+def logfile_init(file=''):
     try:
-        for _, __, obj in jsonfinder(string, json_only=True):
-            if (obj and
-                isinstance(obj, list) and
-                isinstance(obj[0], dict) and
-                {'player_id', 'event_id', 'name'}.issubset(obj[0])
-                ):
-                break
-        else:
-            raise ValueError('data not found')
+        f = open(file, 'w')
+        return f
     except Exception as ex:
         print(ex)
 
-lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
-parse_params={'type':'text/javascript'}
-tbs = wd(lnk, types='script', params = parse_params)
-#print(tbs)
-#scr_list = bs_find(tbs, 'function initPage()', #'<!-- x-xeries js libraries  -->'
-#                    '</script>')
+def logfile(f, file='', str_write=''):
+    f = open(file, 'a')
+    f.write(str_write)
+
+def __main__():
+    lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
+    lnk_param = url.parse.urlparse(lnk)
+    parsekey=['scheme','netloc','path','params','query','fragment',]
+
+    #ParseResult(   scheme='http', 
+    #               netloc='dart.fss.or.kr', 
+    #               path='/dsaf001/main.do', 
+    #               params='', 
+    #               query='rcpNo=20200330004441', 
+    #               fragment='')
+
+    parse_params={'type':'text/javascript'}
+    tbs = wd(lnk, types='script', params = parse_params)
 
 str_a = ['// 1','//팝업 순서']
 scr_list = bs_find(tbs, str_a[0], str_a[1])
@@ -86,3 +93,4 @@ print(len(scr_list))
 #[m.start() for m in re.finditer('test', 'test test test test')]
 for m in re.finditer('([{](.*?)[}])', scr_list[0]):
     print(m.span(), m.group())
+

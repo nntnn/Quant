@@ -11,6 +11,7 @@ import os
 
 import sys
 import io
+import time
 import zipfile
 import xmltodict
 import datetime
@@ -111,33 +112,57 @@ def opendict(filename):
     except Exception as ex:
         print(ex)
 
-def report_list():
+def report_list(code):
+    # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001
     lnk = 'https://opendart.fss.or.kr/api/list.json'
-    lnk_param = url.parse.urlparse(lnk)
-    keys = {
-        'crtfc_key':'5350c2e7125f743afc8946f8e5885f7bf992079c', # 발급받은 인증키(40자리)
-        'corp_code':'',             # 공시대상회사의 고유번호(8자리)
-        'bgn_de':'',                # 검색시작 접수일자(YYYYMMDD) : 없으면 종료일(end_de)
-                                    # 고유번호(corp_code)가 없는 경우 검색기간은 3개월로 제한
-        'end_de':'',                # 검색종료 접수일자(YYYYMMDD) : 없으면 당일
-        'last_reprt_at':'',         # 최종보고서만 검색여부(Y or N) 기본값 : N (정정이 있는 경우 최종정정만 검색)
-        'pblntf_ty':'',             # A : 정기공시
-                                    # B : 주요사항보고
-                                    # C : 발행공시
-                                    # D : 지분공시
-                                    # E : 기타공시
-                                    # F : 외부감사관련
-                                    # G : 펀드공시
-                                    # H : 자산유동화
-                                    # I : 거래소공시
-                                    # j : 공정위공시
-        'pblntf_detail_ty':'',      # (※ 상세 유형 참조 : pblntf_detail_ty)
-        'corp_cls':'',              # 법인구분 : Y(유가), K(코스닥), N(코넥스), E(기타) ※ 없으면 전체조회, 복수조건 불가
-        'sort':'',                  # 
-        'sort_mth':'',              # 오름차순(asc), 내림차순(desc) 기본값 : desc
-        'page_no':'',               # 페이지 번호(1~n) 기본값 : 1
-        'page_count':'',            # 페이지당 건수(1~100) 기본값 : 10, 최대값 : 100
-        }
+    #prs = url.parse.urlparse(lnk)
+    print('get report - ' + str(code))
+    today = datetime.datetime.now().strftime("%Y%m%d")
+    repname = 'rep/'+code+'_'+today+'.rep'
+    if not os.path.isfile(repname):
+        keys = {
+            'crtfc_key':'5350c2e7125f743afc8946f8e5885f7bf992079c', # 발급받은 인증키(40자리)
+            'corp_code':code,             # 공시대상회사의 고유번호(8자리)
+            'bgn_de':'19000101',                # 검색시작 접수일자(YYYYMMDD) : 없으면 종료일(end_de)
+                                        # 고유번호(corp_code)가 없는 경우 검색기간은 3개월로 제한
+            'end_de':today,                # 검색종료 접수일자(YYYYMMDD) : 없으면 당일
+            'last_reprt_at':'Y',         # 최종보고서만 검색여부(Y or N) 기본값 : N (정정이 있는 경우 최종정정만 검색)
+            'pblntf_ty':'A',             # A : 정기공시
+                                        # B : 주요사항보고
+                                        # C : 발행공시
+                                        # D : 지분공시
+                                        # E : 기타공시
+                                        # F : 외부감사관련
+                                        # G : 펀드공시
+                                        # H : 자산유동화
+                                        # I : 거래소공시
+                                        # j : 공정위공시
+            'pblntf_detail_ty':'',      # (※ 상세 유형 참조 : pblntf_detail_ty)
+            'corp_cls':'',              # 법인구분 : Y(유가), K(코스닥), N(코넥스), E(기타) ※ 없으면 전체조회, 복수조건 불가
+            'sort':'',                  # 
+            'sort_mth':'',              # 오름차순(asc), 내림차순(desc) 기본값 : desc
+            'page_no':'1',               # 페이지 번호(1~n) 기본값 : 1
+            'page_count':'100',            # 페이지당 건수(1~100) 기본값 : 10, 최대값 : 100
+            }
+        resp = rq.get(lnk, params=keys)
+        #print(resp.content.decode('utf-8'))
+        #report_dict = resp.json() #json.load(resp.content.decode('utf-8'))
+        try:
+            print(resp.content.decode('utf-8'))
+            report_dict = json.loads(resp.content.decode('utf-8'))
+            print(report_dict.keys())
+            if (report_dict['status'] == '000'):
+                with open(repname, 'w') as outfile:
+                    json.dump(report_dict, outfile, ensure_ascii=False)
+        except Exception as ex:
+            print(ex)
+        time.sleep(0.5)
+    else:
+        with open(repname, 'rb') as handle:
+            print(handle)
+            report_dict = json.loads(handle)
+    #print(report_dict['list'])
+    #pg.show(report_dict['list'])
 
 def jsonparse(lnk:str):
     try:
@@ -212,11 +237,28 @@ def __main__():
     lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
     #jsonparse(lnk)
     corplist = code_list()
+    dic = {'corp_code':[],
+           'corp_name':[],
+           'stock_code':[],
+           'modify_date':[],
+           }
     for item in corplist:
-        #if item['corp_name'] in ["삼성전자", "SK하이닉스", "NAVER"]:
-        print(item)
+        #print(item['stock_code'])
+        if not (item['stock_code'] == None):
+            #print(item)
+            for k,v in item.items():
+                dic[k].append(v)
+    #print(dic)
+    #pg.show(dic)
+    dartcodes = dic['corp_code']
+    print(dartcodes)
+    for clim, code in enumerate(dartcodes):
+        print(code)
+        report_list(code)
+        clim += 1
+        #if clim > 10:
+        #    break
 
-    
 
 if __name__ == "__main__":
     __main__()

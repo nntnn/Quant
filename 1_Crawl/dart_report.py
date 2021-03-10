@@ -116,7 +116,6 @@ def report_list(code):
     # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001
     lnk = 'https://opendart.fss.or.kr/api/list.json'
     #prs = url.parse.urlparse(lnk)
-    print('get report - ' + str(code))
     today = datetime.datetime.now().strftime("%Y%m%d")
     repname = 'rep/'+code+'_'+today+'.rep'
     if not os.path.isfile(repname):
@@ -148,6 +147,7 @@ def report_list(code):
         #print(resp.content.decode('utf-8'))
         #report_dict = resp.json() #json.load(resp.content.decode('utf-8'))
         try:
+            print('get report - ' + str(code))
             print(resp.content.decode('utf-8'))
             report_dict = json.loads(resp.content.decode('utf-8'))
             print(report_dict.keys())
@@ -159,8 +159,8 @@ def report_list(code):
         time.sleep(0.5)
     else:
         with open(repname, 'rb') as handle:
-            print(handle)
-            report_dict = json.loads(handle)
+            report_dict = json.loads(handle.read().decode('euc-kr'))
+            print(report_dict['list'])
     #print(report_dict['list'])
     #pg.show(report_dict['list'])
 

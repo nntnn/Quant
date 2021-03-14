@@ -1,1 +1,65 @@
-{"status": "000", "message": "정상", "page_no": 1, "page_count": 100, "total_count": 5, "total_page": 1, "list": [{"corp_code": "01391033", "corp_name": "NH프라임리츠", "stock_code": "338100", "corp_cls": "Y", "report_nm": "사업보고서 (2020.11)", "rcept_no": "20210210000188", "flr_nm": "NH프라임리츠", "rcept_dt": "20210210", "rm": ""}, {"corp_code": "01391033", "corp_name": "NH프라임리츠", "stock_code": "338100", "corp_cls": "Y", "report_nm": "반기보고서 (2020.08)", "rcept_no": "20201015000054", "flr_nm": "NH프라임리츠", "rcept_dt": "20201015", "rm": ""}, {"corp_code": "01391033", "corp_name": "NH프라임리츠", "stock_code": "338100", "corp_cls": "Y", "report_nm": "사업보고서 (2020.05)", "rcept_no": "20200831000591", "flr_nm": "NH프라임리츠", "rcept_dt": "20200831", "rm": ""}, {"corp_code": "01391033", "corp_name": "NH프라임리츠", "stock_code": "338100", "corp_cls": "Y", "report_nm": "반기보고서 (2020.02)", "rcept_no": "20200414001820", "flr_nm": "NH프라임리츠", "rcept_dt": "20200414", "rm": ""}, {"corp_code": "01391033", "corp_name": "NH프라임리츠", "stock_code": "338100", "corp_cls": "Y", "report_nm": "사업보고서 (2019.11)", "rcept_no": "20200228003204", "flr_nm": "NH프라임리츠", "rcept_dt": "20200228", "rm": ""}]}
+{
+  "status": "000",
+  "message": "정상",
+  "page_no": 1,
+  "page_count": 100,
+  "total_count": 5,
+  "total_page": 1,
+  "list": [
+    {
+      "corp_code": "01391033",
+      "corp_name": "NH프라임리츠",
+      "stock_code": "338100",
+      "corp_cls": "Y",
+      "report_nm": "사업보고서 (2020.11)",
+      "rcept_no": "20210210000188",
+      "flr_nm": "NH프라임리츠",
+      "rcept_dt": "20210210",
+      "rm": ""
+    },
+    {
+      "corp_code": "01391033",
+      "corp_name": "NH프라임리츠",
+      "stock_code": "338100",
+      "corp_cls": "Y",
+      "report_nm": "반기보고서 (2020.08)",
+      "rcept_no": "20201015000054",
+      "flr_nm": "NH프라임리츠",
+      "rcept_dt": "20201015",
+      "rm": ""
+    },
+    {
+      "corp_code": "01391033",
+      "corp_name": "NH프라임리츠",
+      "stock_code": "338100",
+      "corp_cls": "Y",
+      "report_nm": "사업보고서 (2020.05)",
+      "rcept_no": "20200831000591",
+      "flr_nm": "NH프라임리츠",
+      "rcept_dt": "20200831",
+      "rm": ""
+    },
+    {
+      "corp_code": "01391033",
+      "corp_name": "NH프라임리츠",
+      "stock_code": "338100",
+      "corp_cls": "Y",
+      "report_nm": "반기보고서 (2020.02)",
+      "rcept_no": "20200414001820",
+      "flr_nm": "NH프라임리츠",
+      "rcept_dt": "20200414",
+      "rm": ""
+    },
+    {
+      "corp_code": "01391033",
+      "corp_name": "NH프라임리츠",
+      "stock_code": "338100",
+      "corp_cls": "Y",
+      "report_nm": "사업보고서 (2019.11)",
+      "rcept_no": "20200228003204",
+      "flr_nm": "NH프라임리츠",
+      "rcept_dt": "20200228",
+      "rm": ""
+    }
+  ]
+}

@@ -122,7 +122,7 @@ def report_list(code):
         keys = {
             'crtfc_key':'5350c2e7125f743afc8946f8e5885f7bf992079c', # 발급받은 인증키(40자리)
             'corp_code':code,             # 공시대상회사의 고유번호(8자리)
-            'bgn_de':'19000101',                # 검색시작 접수일자(YYYYMMDD) : 없으면 종료일(end_de)
+            'bgn_de':'19600101',                # 검색시작 접수일자(YYYYMMDD) : 없으면 종료일(end_de)
                                         # 고유번호(corp_code)가 없는 경우 검색기간은 3개월로 제한
             'end_de':today,                # 검색종료 접수일자(YYYYMMDD) : 없으면 당일
             'last_reprt_at':'Y',         # 최종보고서만 검색여부(Y or N) 기본값 : N (정정이 있는 경우 최종정정만 검색)
@@ -162,7 +162,7 @@ def report_list(code):
             report_dict = json.loads(handle.read().decode('euc-kr'))
             print(report_dict['list'])
     #print(report_dict['list'])
-    #pg.show(report_dict['list'])
+    pg.show(report_dict['list'])
 
 def jsonparse(lnk:str):
     try:
@@ -233,31 +233,57 @@ def jsonparse(lnk:str):
     except Exception as ex:
         print(ex)
 
+def findfile(path):
+    lst = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith(".rep"):
+                print(os.path.join(root, file))
+                lst.append(os.path.join(root, file))
+    return lst
+
+
 def __main__():
-    lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
-    #jsonparse(lnk)
-    corplist = code_list()
-    dic = {'corp_code':[],
-           'corp_name':[],
-           'stock_code':[],
-           'modify_date':[],
-           }
-    for item in corplist:
-        #print(item['stock_code'])
-        if not (item['stock_code'] == None):
-            #print(item)
-            for k,v in item.items():
-                dic[k].append(v)
-    #print(dic)
-    #pg.show(dic)
-    dartcodes = dic['corp_code']
-    print(dartcodes)
-    for clim, code in enumerate(dartcodes):
-        print(code)
-        report_list(code)
-        clim += 1
-        #if clim > 10:
-        #    break
+    #lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
+    ##jsonparse(lnk)
+    #corplist = code_list()
+    #dic = {'corp_code':[],
+    #       'corp_name':[],
+    #       'stock_code':[],
+    #       'modify_date':[],
+    #       }
+    #for item in corplist:
+    #    #print(item['stock_code'])
+    #    if not (item['stock_code'] == None):
+    #        #print(item)
+    #        for k,v in item.items():
+    #            dic[k].append(v)
+    ##print(dic)
+    ##pg.show(dic)
+    #dartcodes = dic['corp_code']
+    #print(dartcodes)
+    
+    ##for clim, code in enumerate(dartcodes):
+    ##    print(code)
+    ##    report_list(code)
+    ##    clim += 1
+    ##    #if clim > 10:
+    ##    #    break
+
+    path = os.getcwd()
+    reps = findfile(path + '\\rep')
+    for rep in reps: 
+        with open(rep, 'rb') as handle:
+            report_dict = json.loads(handle.read().decode('euc-kr'))
+            #print(report_dict)
+            #pg.show(report_dict['list'])
+            ret = []
+            for lst in report_dict['list']:
+                print(lst)
+                if '사업' in lst['report_nm']:
+                    ret.append(lst)
+            pg.show(ret)
+            
 
 
 if __name__ == "__main__":

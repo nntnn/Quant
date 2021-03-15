@@ -64,13 +64,14 @@ def bs_find(bs, start='', end=''):
     # </script>
     ret_list = []
     try:
-        for b in bs:
-            if len(b) != 0:
-                st_idx = str(b).find(start)
-                ed_idx = str(b).find(end, st_idx)
-                #print(str(b)[st_idx:ed_idx])
-                ret_list.append(str(b)[st_idx:ed_idx])
-        return ret_list
+        if len(bs)>0:
+            for b in bs:
+                if len(b) != 0:
+                    st_idx = str(b).find(start)
+                    ed_idx = str(b).find(end, st_idx)
+                    #print(str(b)[st_idx:ed_idx])
+                    ret_list.append(str(b)[st_idx:ed_idx])
+            return ret_list
     except Exception as ex:
         print(ex)
 
@@ -165,8 +166,10 @@ def jsonparse(lnk:str):
 
         str_a = ['// 1', 'function replaceHtml(']   #function initPage()    'var viewport = new Ext.Viewport']#'//팝업 순서']
         scr_list = bs_find(tbs, str_a[0], str_a[1])
-        print(len(scr_list))
+        print(len(scr_list), scr_list)
     
+
+        for m in re.finditer('().*?()', scr_list[0])
         txtlist = []
         #[m.start() for m in re.finditer('test', 'test test test test')]
         for m in re.finditer('(text: ")(.*?)(",)', scr_list[0]):
@@ -177,6 +180,7 @@ def jsonparse(lnk:str):
         idxdict = {}
         for m_idx, m in enumerate(re.finditer('(viewDoc\(\')(.*?)(\'\))', scr_list[0])):
             #print(m.span(), m.group())
+            
             doclist = []
             for n in re.finditer('(\').*?(\')|(null)', m.group()):
                 #print(n.span(), n.group())
@@ -229,6 +233,7 @@ def findfile(path):
 
 def __main__():
     #lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo=20200330004441'
+    def_lnk = 'http://dart.fss.or.kr/dsaf001/main.do?rcpNo='
     ##jsonparse(lnk)
     #corplist = code_list()
     #dic = {'corp_code':[],
@@ -253,21 +258,33 @@ def __main__():
     ##    clim += 1
     ##    #if clim > 10:
     ##    #    break
-
-    path = os.getcwd()
-    reps = findfile(path + '\\rep')
-    for rep in reps: 
-        with open(rep, 'rb') as handle:
-            report_dict = json.loads(handle.read().decode('euc-kr'))
-            #print(report_dict)
-            #pg.show(report_dict['list'])
-            ret = []
-            for lst in report_dict['list']:
-                print(lst)
-                if '사업' in lst['report_nm']:
-                    ret.append(lst)
-            pg.show(ret)
+    #if True:
+    #    path = os.getcwd()
+    #    reps = findfile(path + '\\rep')
+    #    for rep in reps: 
+    #        with open(rep, 'rb') as handle:
+    #            report_dict = json.loads(handle.read().decode('euc-kr'))
+    #            #print(report_dict)
+    #            #pg.show(report_dict['list'])
+    #            ret = []
+    #            for lst in report_dict['list']:
+    #                jsonparse(lst)
+    #                print(lst)
+    #                if '사업' in lst['report_nm']:
+    #                    ret.append(lst)
             
+    #            df = pd.DataFrame(ret)
+    #            pg.show(df)
+    #            rep_list = list(df['rcept_no'])
+    #            for repl in rep_list:
+    #                print(int(repl[:4]))
+    #                if int(repl[:4]) >= 2017:
+    #                    print(def_lnk + repl)
+    #                    jsonparse(def_lnk + repl)
+                    
+    #            #pg.show(df)
+    repl = '20170330001309'
+    jsonparse(def_lnk + repl)
 
 
 if __name__ == "__main__":

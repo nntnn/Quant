@@ -96,22 +96,6 @@ def code_list():
     except Exception as ex:
         print(ex)
 
-def savedict(filename, dct):
-    #filename = '20200330004441.dump'
-    try:
-        with open(filename,'wb') as fw:
-            pickle.dump(dct, fw)
-    except Exception as ex:
-        print(ex)
-
-def opendict(filename):
-    try:
-        with open(filename, 'rb') as handle:
-            b = pickle.load(handle)
-            return b
-    except Exception as ex:
-        print(ex)
-
 def report_list(code):
     # https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001
     lnk = 'https://opendart.fss.or.kr/api/list.json'
